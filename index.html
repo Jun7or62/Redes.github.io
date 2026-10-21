@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Social Orbit — Mis redes</title>
+<style>
+  :root{color-scheme:dark;--bg:#080c18;--panel:#10182a;--text:#f4f7ff;--muted:#9aa8c4;--line:rgba(255,255,255,.1);--glow:rgba(96,165,250,.24)}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100svh;background:radial-gradient(ellipse at 50% 35%,#172544 0%,#0b1122 45%,#070a13 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;padding:22px;overflow-x:hidden}
+  .app{width:min(100%,900px);text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#ffffff08;border-radius:999px;padding:8px 13px;color:#c8d7f5;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase}
+  .dot{width:7px;height:7px;border-radius:50%;background:#55e6a5;box-shadow:0 0 12px #55e6a5}
+  h1{font-size:clamp(2rem,6vw,3.5rem);letter-spacing:-.055em;margin:17px 0 8px;line-height:1.04}
+  .subtitle{color:var(--muted);margin:0 auto;max-width:520px;font-size:clamp(.9rem,2.5vw,1.05rem);line-height:1.6}
+  .stage{position:relative;width:min(88vw,570px);aspect-ratio:1;margin:24px auto 12px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+  .stage:active{cursor:grabbing}
+  .orbit{position:absolute;inset:8%;border:1px solid rgba(165,190,255,.18);border-radius:50%;box-shadow:0 0 70px #5b8cff0b,inset 0 0 55px #5b8cff08}
+  .orbit:before,.orbit:after{content:"";position:absolute;border:1px solid rgba(165,190,255,.1);border-radius:50%;inset:10%}
+  .orbit:after{inset:20%;border-style:dashed;opacity:.55}
+  .planet-track{position:absolute;inset:0;transform:rotate(var(--angle,0deg));will-change:transform}
+  .social{position:absolute;left:50%;top:50%;width:clamp(68px,15vw,88px);height:clamp(68px,15vw,88px);margin:calc(clamp(68px,15vw,88px)/-2);border-radius:25px;display:grid;place-items:center;background:linear-gradient(145deg,#18243b,#0e1729);border:1px solid rgba(255,255,255,.15);box-shadow:0 12px 34px #0007,inset 0 1px #ffffff18;color:white;text-decoration:none;transition:box-shadow .25s,border-color .25s,filter .25s;outline:none}
+  .social:hover,.social:focus-visible{border-color:#ffffff7a;box-shadow:0 0 0 5px #ffffff0b,0 12px 38px #0008;filter:brightness(1.18)}
+  .social svg{width:36px;height:36px;filter:drop-shadow(0 4px 10px #0005)}
+  .social .name{position:absolute;top:calc(100% + 10px);font-size:.75rem;font-weight:650;letter-spacing:.01em;white-space:nowrap;text-shadow:0 2px 10px #000}
+  .whatsapp{--accent:#35d98a}.tiktok{--accent:#ff4d78}.instagram{--accent:#d879ff}.facebook{--accent:#6aa9ff}
+  .social::before{content:"";position:absolute;inset:-1px;border-radius:inherit;background:var(--accent);opacity:.11;filter:blur(15px);z-index:-1}
+  .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(72px,17vw,100px);height:clamp(72px,17vw,100px);border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 25%,#304b7a,#111a30 70%);border:1px solid #a9c8ff66;box-shadow:0 0 0 9px #a9c8ff08,0 0 40px #6397ff24,inset 0 2px 12px #ffffff1a;z-index:3}
+  .center span{font-size:clamp(1.7rem,6vw,2.5rem);filter:drop-shadow(0 3px 10px #77baff80)}
+  .center small{position:absolute;top:calc(100% + 12px);font-size:.65rem;letter-spacing:.16em;text-transform:uppercase;color:#b9c8e5;white-space:nowrap}
+  .hint{display:flex;justify-content:center;align-items:center;gap:8px;color:#a9b7d2;font-size:.8rem;margin:8px auto 22px}
+  .hint svg{width:17px;height:17px;opacity:.85}
+  .profiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 auto;max-width:760px;text-align:left}
+  .profile{border:1px solid var(--line);background:linear-gradient(145deg,#ffffff09,#ffffff03);border-radius:16px;padding:14px 13px;min-width:0}
+  .profile-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.88rem;font-weight:700}
+  .mini{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#ffffff10;flex-shrink:0}
+  .mini svg{width:16px;height:16px}
+  .profile p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.45;overflow-wrap:anywhere}
+  .profile a{color:#d8e5ff;text-decoration:none}
+  .profile a:hover{text-decoration:underline}
+  .status{display:inline-flex;margin-top:10px;font-size:.68rem;color:#a7b8d8;border:1px solid #ffffff14;border-radius:999px;padding:4px 7px}
+  .status.ready{color:#8ce9b8;border-color:#3cbb7c40;background:#35d98a0c}
+  footer{color:#73819e;font-size:.72rem;margin:22px 0 0}
+  @media(max-width:560px){body{padding:24px 14px}.stage{width:min(94vw,430px);margin-top:24px}.profiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.profile{padding:12px}.social .name{font-size:.7rem}.hint{font-size:.75rem}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <section class="stage" id="stage" aria-label="Ruleta interactiva de redes sociales. Arrastra para girar." role="application">
+    <div class="orbit"></div>
+    <div class="planet-track" id="track">
+      <a class="social whatsapp" href="https://wa.me/qr/EZ6MWST4WZODF1" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path fill="#35D98A" d="M16 3.1A12.6 12.6 0 0 0 5.2 22.2L3.5 28.5l6.5-1.7A12.6 12.6 0 1 0 16 3.1Z"/><path fill="#10251E" d="M22.5 18.8c-.35-.18-2.05-1.01-2.37-1.12-.32-.12-.55-.18-.78.18-.23.35-.9 1.12-1.1 1.35-.2.23-.4.26-.75.09-.35-.18-1.48-.55-2.82-1.75-1.04-.93-1.75-2.08-1.96-2.43-.2-.35-.02-.54.16-.71.16-.16.35-.4.52-.61.18-.2.23-.35.35-.58.12-.23.06-.44-.03-.61-.09-.18-.78-1.87-1.07-2.56-.28-.67-.57-.58-.78-.59h-.66c-.23 0-.61.09-.93.44-.32.35-1.22 1.19-1.22 2.89s1.25 3.35 1.42 3.58c.18.23 2.45 3.74 5.94 5.25.83.36 1.48.58 1.99.74.84.27 1.61.23 2.22.14.68-.1 2.05-.84 2.34-1.65.29-.81.29-1.5.2-1.65-.09-.15-.32-.23-.67-.4Z"/></svg>
+        <span class="name">WhatsApp</span>
+      </a>
+      <a class="social tiktok" href="https://www.tiktok.com/@jun7or62?_r=1&_t=ZS-9AjNzDJzmvB" target="_blank" rel="noopener noreferrer" aria-label="Abrir TikTok">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path fill="#25F4EE" d="M18.2 3h4.2c.3 2.8 1.9 4.8 4.6 5.6v4.3a12.4 12.4 0 0 1-4.6-1.6v9.1a8.2 8.2 0 1 1-8.2-8.2c.5 0 1 .05 1.5.14v4.4a4 4 0 1 0 2.5 3.7V3Z" transform="translate(-1 1)"/><path fill="#FE2C55" d="M16.2 5h4.2c.3 2.8 1.9 4.8 4.6 5.6v4.3a12.4 12.4 0 0 1-4.6-1.6v9.1a8.2 8.2 0 1 1-8.2-8.2c.5 0 1 .05 1.5.14v4.4a4 4 0 1 0 2.5 3.7V5Z"/><path fill="white" d="M18.1 3h3.5c.3 2.8 1.9 4.8 4.6 5.6v3.3a10.8 10.8 0 0 1-4.6-2V19a7 7 0 1 1-7-7c.4 0 .8.03 1.2.1v3.7a3.5 3.5 0 1 0 2.3 3.3V3Z"/></svg>
+        <span class="name">TikTok</span>
+      </a>
+      <a class="social instagram" href="#" aria-label="Instagram: No tengo :)" data-message="No tengo :)">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="7" stroke="#D879FF" stroke-width="2.8"/><circle cx="16" cy="16" r="5.5" stroke="white" stroke-width="2.6"/><circle cx="23.3" cy="8.9" r="1.7" fill="#D879FF"/></svg>
+        <span class="name">Instagram</span>
+      </a>
+      <a class="social facebook" href="#" aria-label="Facebook: No lo uso" data-message="No lo uso">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path fill="#6AA9FF" d="M18.4 28V17.3h3.6l.55-4.2H18.4v-2.7c0-1.22.34-2.05 2.1-2.05h2.24V4.6c-.39-.05-1.72-.17-3.28-.17-3.25 0-5.48 1.98-5.48 5.62v3.05h-3.68v4.2h3.68V28h4.42Z"/></svg>
+        <span class="name">Facebook</span>
+      </a>
+    </div>
+    <div class="center"><span>🌐</span></div>
+  </section>
+
+
+</main>
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const track = document.getElementById('track');
+  const items = [...track.querySelectorAll('.social')];
+  let movedDuringGesture = false;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let angle = 0, velocity = 0, dragging = false, lastPointerAngle = 0, lastTime = 0, raf = 0;
+  // Audio sintético: no requiere archivos de sonido externos.
+  let audioCtx = null, lastTickAt = 0, lastTickAngle = 0;
+  const getAudio = () => {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      audioCtx = new AudioContextClass();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  };
+  const tone = (frequency, duration, type = 'sine', volume = 0.035, endFrequency = null) => {
+    const ctx = getAudio();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, now);
+    if (endFrequency) osc.frequency.exponentialRampToValueAtTime(Math.max(1, endFrequency), now + duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + duration + 0.015);
+  };
+  const spinTick = (strength = 1) => {
+    const now = performance.now();
+    if (now - lastTickAt < 38) return;
+    lastTickAt = now;
+    const speed = Math.min(1, Math.max(0.15, strength));
+    tone(720 + speed * 260, 0.035, 'triangle', 0.012 + speed * 0.012, 430);
+  };
+  const tapSound = () => {
+    tone(620, 0.075, 'sine', 0.045, 920);
+    setTimeout(() => tone(920, 0.09, 'sine', 0.025, 680), 45);
+  };
+  const placeItems = () => {
+    const r = stage.clientWidth * 0.38;
+    items.forEach((item, i) => {
+      const a = (i * 90 - 90) * Math.PI / 180;
+      item.style.transform = `translate(${Math.cos(a) * r}px, ${Math.sin(a) * r}px)`;
+    });
+  };
+  const setAngle = value => {
+    angle = value;
+    track.style.transform = `rotate(${angle}deg)`;
+  };
+  const pointerAngle = e => {
+    const rect = stage.getBoundingClientRect();
+    return Math.atan2(e.clientY - (rect.top + rect.height / 2), e.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+  };
+  const animate = () => {
+    if (!dragging) {
+      if (Math.abs(velocity) > 0.015) {
+        setAngle(angle + velocity);
+        spinTick(Math.abs(velocity));
+        velocity *= 0.985;
+        raf = requestAnimationFrame(animate);
+      } else { velocity = 0; raf = 0; }
+    }
+  };
+  stage.addEventListener('click', e => {
+    const link = e.target.closest('a.social');
+    if (!link) return;
+    if (link.classList.contains('instagram') || link.classList.contains('facebook')) {
+      e.preventDefault();
+      tapSound();
+      const message = link.classList.contains('instagram') ? 'No tengo :)' : 'No lo uso';
+      showToast(message);
+    } else {
+      tapSound();
+    }
+  });
+  let toastTimer = 0;
+  const toast = document.createElement('div');
+  toast.setAttribute('role', 'status');
+  toast.style.cssText = 'position:absolute;left:50%;top:calc(50% + 78px);transform:translate(-50%,8px);opacity:0;pointer-events:none;padding:9px 15px;border:1px solid #ffffff26;border-radius:999px;background:#10182aee;color:#f4f7ff;font:600 14px/1.2 system-ui,sans-serif;box-shadow:0 8px 24px #0006;transition:opacity .18s,transform .18s;z-index:5;white-space:nowrap;';
+  stage.appendChild(toast);
+  const showToast = message => {
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translate(-50%,0)';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translate(-50%,8px)';
+    }, 1500);
+  };
+  stage.addEventListener('pointerdown', e => {
+    getAudio();
+    if (e.target.closest('a')) {
+      // Keep links clickable; dragging from a social card still rotates when movement begins.
+    }
+    dragging = true;
+    velocity = 0;
+    lastPointerAngle = pointerAngle(e);
+    lastTime = performance.now();
+    stage.setPointerCapture(e.pointerId);
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const now = performance.now();
+    const current = pointerAngle(e);
+    let delta = current - lastPointerAngle;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    setAngle(angle + delta);
+    if (Math.abs(delta) > 0.25) spinTick(Math.abs(delta) / Math.max(1, now - lastTime) * 16);
+    const dt = Math.max(1, now - lastTime);
+    velocity = delta / dt * 16;
+    lastPointerAngle = current;
+    lastTime = now;
+  });
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    if (!reducedMotion) raf = requestAnimationFrame(animate);
+  };
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+  stage.addEventListener('lostpointercapture', endDrag);
+  stage.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      setAngle(angle + (e.key === 'ArrowRight' ? 15 : -15));
+    }
+  });
+  window.addEventListener('resize', placeItems);
+  placeItems();
+})();
+</script>
+</body>
+</html>
